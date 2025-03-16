@@ -1,0 +1,483 @@
+/* src/styles/main.css */
+
+/* Gjør hele nettsiden mer lesbar med en jevn font */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  background-image: url(/src/assets/duhok1.webp);
+  color: #333;
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+/* Header styling */
+header {
+  background-color: #005f73;
+  color: #fff;
+  padding: 10px 0;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+nav ul li {
+  display: inline;
+  margin: 0 10px;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+nav ul li a:hover {
+  text-decoration: underline;
+}
+
+/* Sørg for at all tekst i headeren er hvit */
+.navbar-nav .nav-link,
+.navbar-brand {
+  color: #fff !important;
+}
+
+/* Sørg for at knappen for "Logg ut" også har hvit tekst */
+.navbar-nav .btn-secondary {
+  color: #ffffff !important;
+}
+
+/* Når man holder musen over lenker, sørg for at de ikke endrer farge */
+.navbar-nav .nav-link:hover {
+  color: #6ea6de !important;
+}
+
+/* Footer styling */
+footer {
+  background-color: #005f73;
+  color: #fff;
+  text-align: center;
+  padding: 10px 0;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+}
+
+/* Main content area */
+main {
+  padding: 20px;
+  margin-bottom: 50px; /* For å unngå at innholdet overlapper med footeren */
+}
+
+h2 {
+  color: #dde8eb;
+}
+
+/* Gjør knappene mer attraktive */
+button {
+  background-color: #0a9396;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #94d2bd;
+}
+
+/* Legg til denne delen for å style bønnetidene */
+.prayer-times {
+  background-color: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 600px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.prayer-times h2, .about h2, .contact-info h3, .location h3, .news h3, .media h3, .donation-info h2 {
+  text-align: center;
+  color: #005f73;
+}
+
+.velkommen {
+  text-align: center;
+  color: #fff;
+}
+
+.prayer-times table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.prayer-times th, .prayer-times td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.prayer-times th {
+  background-color: #005f73;
+  color: #fff;
+}
+
+.prayer-times tr:nth-child(even) {
+  background-color: #f4f4f4;
+}
+
+.prayer-times tr:hover {
+  background-color: #e0f7fa;
+}
+
+.prayer-times p {
+  text-align: center;
+  font-size: 1.2em;
+  color: #555;
+  margin-top: -10px;
+}
+
+button {
+  background-color: #0a9396;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+button:hover {
+  background-color: #94d2bd;
+}
+
+/* Legg til denne delen for å style dropdown-menyen */
+select {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Legg til denne delen for å style tabellen for månedlige bønnetider */
+.prayer-times table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.prayer-times th, .prayer-times td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.prayer-times th {
+  background-color: #005f73;
+  color: #fff;
+}
+
+.prayer-times tr:nth-child(even) {
+  background-color: #f4f4f4;
+}
+
+.prayer-times tr:hover {
+  background-color: #e0f7fa;
+}
+
+/* Legg til denne delen for å style kontaktinformasjonen */
+.contact-info, .donation-info {
+  background-color: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 600px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* Legg til denne delen for å style kartet */
+.location {
+  background-color: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.map-container {
+  width: 100%;
+  height: 450px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Style nyhetsseksjonen */
+.news {
+  background-color: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.login {
+  background-color: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.about {
+  background-color: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* Style nyhetskortene */
+.news-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.news-card {
+  background-color: gold;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: calc(33% - 20px);
+  box-sizing: border-box;
+}
+
+.news-card h4 {
+  margin-top: 0;
+  color: #005f73;
+}
+
+.news-card p {
+  margin: 10px 0;
+}
+
+/* Style skjemaet */
+.news form {
+  margin-bottom: 20px;
+}
+
+.news form div {
+  margin-bottom: 10px;
+}
+
+.news label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.news input, .news textarea {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.news textarea {
+  resize: vertical;
+}
+
+.news button {
+  background-color: #0a9396;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.news button:hover {
+  background-color: #94d2bd;
+}
+
+/* Style nyhetslisten */
+.news ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.news li {
+  margin-bottom: 20px;
+}
+
+.news h4, .media h4 {
+  margin: 0;
+  color: #005f73;
+}
+
+/* Style medieseksjonen */
+.media {
+  background-color: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.fixed-media-size {
+  width: 100%;
+  height: 250px; /* Juster høyden etter behov */
+  object-fit: cover; /* Beholder medieinnholdets proporsjoner */
+}
+
+.custom-video {
+  width: 100%;
+  height: 250px; /* Juster høyden etter behov */
+  object-fit: cover; /* Beholder medieinnholdets proporsjoner */
+}
+
+/* Style media in the modal */
+.modal-body img {
+  width: 100%;
+  height: auto;
+  object-fit: contain; /* Ensure the whole image is visible */
+}
+
+.modal-body video {
+  width: 100%;
+  height: auto;
+}
+
+/* Style mediekortene */
+.media form {
+  margin-bottom: 20px;
+}
+
+.media form div {
+  margin-bottom: 10px;
+}
+
+.media label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.media input, .media textarea {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.media textarea {
+  resize: vertical;
+}
+
+.media button {
+  background-color: #0a9396;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.media button:hover {
+  background-color: #94d2bd;
+}
+
+.media-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.media-card {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: calc(33% - 20px);
+  box-sizing: border-box;
+}
+
+.media-card img, .media-card video {
+  width: 100%;
+  height: 250px; /* Juster høyden etter behov */
+  object-fit: cover; /* Ensure media fits well within the card */
+}
+
+.media-card h5 {
+  margin-top: 10px;
+  color: #005f73;
+}
+
+.media-card p {
+  margin: 10px 0;
+}
+
+.whatsapp-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: white;
+  border-radius: 50%;
+  padding: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+.whatsapp-button:hover {
+  transform: scale(1.1);
+}
+
+/* Donation */
+.donation-info {
+  margin-top: 30px;
+}
+
+.donation-section {
+  margin-bottom: 30px;
+}
+
+html .aya {
+  direction: rtl;
+}
+
+.alert-info {
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+  color: #31708f;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h2, h3 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 1.1rem;
+}
