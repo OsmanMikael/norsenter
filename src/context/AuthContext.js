@@ -1,41 +1,37 @@
 import { useState, useEffect, createContext, useContext } from 'react';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAdmin, setIsAdmin] = useState(() => {
-    // Hent innloggingsstatus fra localStorage
-    return JSON.parse(localStorage.getItem('isAdmin')) || false;
-  });
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Lagre innloggingsstatus i localStorage
-    localStorage.setItem('isAdmin', JSON.stringify(isAdmin));
+    const auth = getAuth();
 
-    // Sett opp inaktivitetstimer
-    let timeoutId;
-    const resetTimer = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(logout, 3 * 60 * 1000); // 3 minutter
-    };
+    // Lytt etter endringer i Firebase Authentication
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser?.email === 'ramiar987@gmail.com') {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    });
 
-    document.addEventListener('mousemove', resetTimer);
-    document.addEventListener('keydown', resetTimer);
-
-    return () => {
-      clearTimeout(timeoutId);
-      document.removeEventListener('mousemove', resetTimer);
-      document.removeEventListener('keydown', resetTimer);
-    };
-  }, [isAdmin]);
+    return () => unsubscribe();
+  }, []);
 
   const logout = () => {
+    const auth = getAuth();
+    signOut(auth);
     setIsAdmin(false);
-    localStorage.removeItem('isAdmin');
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAdmin, setIsAdmin, logout }}>
+    <AuthContext.Provider value={{ isAdmin, setIsAdmin, user, logout }}>
       {children}
     </AuthContext.Provider>
   );

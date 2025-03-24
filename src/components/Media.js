@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getAllMedia, saveMedia, deleteMedia } from './db'; // Importer IndexedDB-funksjoner
+import { getAllMedia, saveMedia, deleteMedia } from './firebase'; // Importer Firebase-funksjoner
 
 const Medier = () => {
   const [media, setMedia] = useState([]);
@@ -13,10 +13,15 @@ const Medier = () => {
   const [editItem, setEditItem] = useState(null);
   const { isAdmin } = useAuth();
 
+  // Hent media fra Firestore ved montering
   useEffect(() => {
     const fetchMedia = async () => {
-      const storedMedia = await getAllMedia();
-      setMedia(storedMedia);
+      try {
+        const storedMedia = await getAllMedia();
+        setMedia(storedMedia);
+      } catch (error) {
+        console.error("Feil ved henting av media:", error);
+      }
     };
     fetchMedia();
   }, []);
@@ -29,15 +34,21 @@ const Medier = () => {
     setEditItem(item);
   };
 
-  const handleMediaDelete = async (id) => {
-    await deleteMedia(id);
-    const updatedMedia = media.filter((item) => item.id !== id);
-    setMedia(updatedMedia);
+  const handleMediaDelete = async (id, fileUrl) => {
+    try {
+      await deleteMedia(id, fileUrl);
+      const updatedMedia = media.filter((item) => item.id !== id);
+      setMedia(updatedMedia);
+    } catch (error) {
+      console.error("Feil ved sletting av media:", error);
+      alert("Noe gikk galt ved sletting av media. Prøv igjen.");
+    }
   };
 
   const handleMediaClick = (item) => {
     setSelectedMedia(item);
-    const modal = new window.bootstrap.Modal(document.getElementById("mediaModal"));
+    const modalElement = document.getElementById("mediaModal");
+    const modal = window.bootstrap.Modal.getInstance(modalElement) || new window.bootstrap.Modal(modalElement);
     modal.show();
   };
 
@@ -46,52 +57,40 @@ const Medier = () => {
 
     if (!mediaFile && !editMode) return;
 
-    const processFile = () => {
-      if (editMode && !mediaFile) {
-        const updatedMedia = media.map((item) =>
-          item.id === editItem.id
-            ? { ...item, title: mediaTitle, date: mediaDate, description: mediaDescription }
-            : item
-        );
-        saveMedia({ id: editItem.id, title: mediaTitle, date: mediaDate, description: mediaDescription, fileUrl: editItem.fileUrl, fileType: editItem.fileType });
-        setMedia(updatedMedia);
-        resetForm();
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const fileData = reader.result; // Base64-data
-        const fileType = mediaFile?.type?.startsWith("video") ? "video" : "image";
-
-        let updatedMedia;
-        if (editMode && editItem) {
-          updatedMedia = media.map((item) =>
-            item.id === editItem.id
-              ? { ...item, title: mediaTitle, date: mediaDate, description: mediaDescription, fileUrl: fileData, fileType }
-              : item
-          );
-        } else {
-          const newMedia = {
-            id: Date.now(),
-            title: mediaTitle,
-            date: mediaDate,
-            description: mediaDescription,
-            fileUrl: fileData,
-            fileType,
-          };
-          updatedMedia = [...media, newMedia];
-        }
-
-        await saveMedia(updatedMedia[updatedMedia.length - 1]);
-        setMedia(updatedMedia);
-        resetForm();
-      };
-
-      reader.readAsDataURL(mediaFile);
+    const mediaItem = {
+      title: mediaTitle,
+      date: mediaDate,
+      description: mediaDescription,
     };
 
-    processFile();
+    try {
+      let result;
+      if (editMode && editItem) {
+        // Oppdater eksisterende media
+        result = await saveMedia({ id: editItem.id, ...mediaItem }, mediaFile || editItem.fileUrl);
+        if (result.success) {
+          const updatedMedia = media.map((item) =>
+            item.id === editItem.id ? { ...item, ...mediaItem } : item
+          );
+          setMedia(updatedMedia);
+        } else {
+          throw new Error(result.error);
+        }
+      } else {
+        // Legg til ny media
+        result = await saveMedia(mediaItem, mediaFile);
+        if (result.success) {
+          const updatedMedia = [...media, { id: result.id, ...mediaItem }];
+          setMedia(updatedMedia);
+        } else {
+          throw new Error(result.error);
+        }
+      }
+      resetForm();
+    } catch (error) {
+      console.error("Feil ved lagring av media:", error);
+      alert("Noe gikk galt ved lagring av media. Prøv igjen.");
+    }
   };
 
   const resetForm = () => {
@@ -182,7 +181,7 @@ const Medier = () => {
                     <button className="btn btn-secondary mr-2" onClick={() => handleMediaEdit(item)}>
                       Rediger
                     </button>
-                    <button className="btn btn-danger" onClick={() => handleMediaDelete(item.id)}>
+                    <button className="btn btn-danger" onClick={() => handleMediaDelete(item.id, item.fileUrl)}>
                       Slett
                     </button>
                   </>

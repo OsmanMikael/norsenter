@@ -1,23 +1,34 @@
-// src/components/Login.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { setIsAdmin } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Enkel autentisering: Bare for demonstrasjon.
-    if (username === 'admin' && password === 'admin') {
-      setIsAdmin(true);
-      navigate('/'); // Omdiriger til Hjem-siden etter vellykket innlogging
-    } else {
-      setIsAdmin(false);
-      alert('Feil brukernavn eller passord');
+    const auth = getAuth();
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      console.log('Innlogget:', user.email);
+
+      // Hvis brukeren er admin (sjekk e-post eller rolle i Firestore)
+      if (user.email === 'ramiar987@gmail.com') {
+        setIsAdmin(true);
+        navigate('/'); // Omdiriger til Hjem-siden
+      } else {
+        alert('Du har ikke admin-tilgang');
+      }
+    } catch (error) {
+      console.error('Feil ved innlogging:', error.message);
+      alert('Feil e-post eller passord.');
     }
   };
 
@@ -27,13 +38,13 @@ const Login = () => {
       <section className='login'>
       <form onSubmit={handleLogin}>
         <div className="form-group">
-          <label htmlFor="username">Brukernavn:</label>
+          <label htmlFor="email">E-post:</label>
           <input
-            type="text"
-            id="username"
+            type="email"
+            id="email"
             className="form-control"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>

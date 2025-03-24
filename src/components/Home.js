@@ -4,7 +4,7 @@ import PrayerTimes from "./PrayerTimes";
 import { FaWhatsapp } from "react-icons/fa"; // Importer WhatsApp-ikonet
 import Donations from "./Donations";
 import Medier from "./Media";
-import { getAllNews, saveNews, deleteNews } from './db'; // Importer IndexedDB-funksjoner
+import { getAllNews, saveNews, deleteNews } from './firebase'; // Importer Firebase-funksjoner
 
 const Home = () => {
   const { isAdmin } = useAuth();
@@ -16,37 +16,53 @@ const Home = () => {
   const [content, setContent] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [editItem, setEditItem] = useState(null);
+  const [loading, setLoading] = useState(false); // Loading state
 
-  // Hent nyheter fra IndexedDB ved montering
+  // Hent nyheter fra Firestore ved montering
   useEffect(() => {
     const fetchNews = async () => {
-      const storedNews = await getAllNews();
-      setNews(storedNews);
+      try {
+        const storedNews = await getAllNews();
+        setNews(storedNews);
+      } catch (error) {
+        console.error("Error fetching news:", error);
+      }
     };
     fetchNews();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Sett loading state til true
     let updatedNews;
 
-    if (editMode && editItem) {
-      updatedNews = news.map((item) =>
-        item.id === editItem.id ? { ...item, title, date, content } : item
-      );
-      await saveNews({ id: editItem.id, title, date, content });
-    } else {
-      const newNews = {
-        id: Date.now(),
-        title,
-        date,
-        content,
-      };
-      updatedNews = [...news, newNews];
-      await saveNews(newNews);
+    try {
+      if (editMode && editItem) {
+        updatedNews = news.map((item) =>
+          item.id === editItem.id ? { ...item, title, date, content } : item
+        );
+        await saveNews({ id: editItem.id, title, date, content });
+      } else {
+        const newNews = {
+          title,
+          date,
+          content,
+        };
+        updatedNews = [...news, newNews];
+        console.log("Saving new news item:", newNews); // Logg nyheten som legges til
+        const result = await saveNews(newNews);
+        if (result.success) {
+          newNews.id = result.id; // Sett den genererte ID-en
+        }
+      }
+
+      setNews(updatedNews);
+    } catch (error) {
+      console.error("Error saving news:", error);
+    } finally {
+      setLoading(false); // Sett loading state til false
     }
 
-    setNews(updatedNews);
     setEditMode(false);
     setEditItem(null);
     setTitle("");
@@ -63,9 +79,16 @@ const Home = () => {
   };
 
   const handleDelete = async (id) => {
-    await deleteNews(id);
-    const updatedNews = news.filter((item) => item.id !== id);
-    setNews(updatedNews);
+    setLoading(true); // Sett loading state til true
+    try {
+      await deleteNews(id);
+      const updatedNews = news.filter((item) => item.id !== id);
+      setNews(updatedNews);
+    } catch (error) {
+      console.error("Error deleting news:", error);
+    } finally {
+      setLoading(false); // Sett loading state til false
+    }
   };
 
   return (
@@ -124,9 +147,10 @@ const Home = () => {
                 required
               ></textarea>
             </div>
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-primary" disabled={loading}>
               {editMode && editItem ? "Oppdater nyhet" : "Legg til nyhet"}
             </button>
+            {loading && <div className="spinner-border mt-2" role="status"><span className="sr-only">Laster...</span></div>} {/* Vis en lastemelding */}
           </form>
         )}
         <div className="row">
@@ -163,7 +187,7 @@ const Home = () => {
       </section>
 
       <Medier />
-      
+
       <Donations />
       {/* WhatsApp-knapp */}
       <a
