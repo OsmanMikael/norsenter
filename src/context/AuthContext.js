@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     // Lytt etter endringer i Firebase Authentication
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (currentUser?.email === 'ramiar987@gmail.com') {
+      if (currentUser?.email === 'norsenter18f@gmail.com') {
         setIsAdmin(true);
       } else {
         setIsAdmin(false);

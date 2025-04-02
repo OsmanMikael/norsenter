@@ -15,11 +15,7 @@ const Contact = () => {
   useEffect(() => {
     const fetchContacts = async () => {
       const storedContacts = await getAllContacts();
-      setContacts(storedContacts.map((contact, index) => ({
-        ...contact,
-        id: contact.id || `temp-${index}-${contact.name}-${contact.phone}`
-      })));
-      console.log("Hentede kontakter:", storedContacts);
+      setContacts(storedContacts);
     };
     fetchContacts();
   }, []);
@@ -35,23 +31,25 @@ const Contact = () => {
       alert("Vennligst fyll inn alle felt!");
       return;
     }
-  
-    if (editContact.id && !editContact.id.startsWith("temp-")) {
-      // Oppdater eksisterende kontakt
+
+    if (editContact.id) {
+      // 🔹 Oppdater eksisterende kontakt
       await updateContact(editContact.id, { name: editContact.name, phone: editContact.phone });
-      setContacts(contacts.map(c => (c.id === editContact.id ? editContact : c)));
+
+      // 🔹 Oppdater kontaktlisten i state
+      setContacts(contacts.map(c => (c.id === editContact.id ? { ...c, ...editContact } : c)));
     } else {
-      // Lag ny kontakt
-      const newId = await saveContact(editContact);
+      // 🔹 Lag ny kontakt
+      const newId = await saveContact(editContact); // Lagre kontakt og få ID fra Firestore
       setContacts([...contacts, { id: newId, ...editContact }]);
     }
-  
+
     setEditContact(null);
   };
 
   // 🔹 Slett kontakt
   const handleDelete = async (id) => {
-    if (!id || id.startsWith("temp-")) {
+    if (!id) {
       console.error("Contact ID is null or undefined");
       return;
     }
@@ -100,11 +98,11 @@ const Contact = () => {
           </button>
         )}
 
-<h4>Kontakter</h4>
+        <h4>Kontakter</h4>
         {isAdmin && (
           <button
             className="btn btn-primary mb-3"
-            onClick={() => setEditContact({ id: `temp-${Date.now()}`, name: '', phone: '' })}
+            onClick={() => setEditContact({ name: '', phone: '' })}
           >
             Legg til ny kontakt
           </button>
@@ -124,7 +122,7 @@ const Contact = () => {
 
         {editContact && (
           <div>
-            <h4>{editContact.id.startsWith("temp-") ? 'Legg til ny kontakt' : 'Rediger kontakt'}</h4>
+            <h4>{editContact.id ? 'Rediger kontakt' : 'Legg til ny kontakt'}</h4>
             <div className="form-group">
               <label htmlFor="name">Navn:</label>
               <input

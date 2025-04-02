@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getAllMedia, saveMedia, deleteMedia } from './firebase'; // Importer Firebase-funksjoner
+import { Modal } from 'bootstrap';
 
 const Medier = () => {
   const [media, setMedia] = useState([]);
@@ -45,57 +46,67 @@ const Medier = () => {
     }
   };
 
+  
+
   const handleMediaClick = (item) => {
     setSelectedMedia(item);
     const modalElement = document.getElementById("mediaModal");
-    const modal = window.bootstrap.Modal.getInstance(modalElement) || new window.bootstrap.Modal(modalElement);
+    const modal = Modal.getInstance(modalElement) || new Modal(modalElement);
     modal.show();
   };
+  
+
 
   const handleMediaSubmit = async (e) => {
     e.preventDefault();
-
-    if (!mediaFile && !editMode) return;
-
+  
+    if (!mediaFile && !editMode) {
+      console.error("Ingen fil valgt, og vi er ikke i redigeringsmodus.");
+      return;
+    }
+  
+    // Bruk eksisterende fileUrl og filePath hvis ingen ny fil lastes opp
     const mediaItem = {
       title: mediaTitle,
       date: mediaDate,
       description: mediaDescription,
+      fileUrl: editMode && editItem ? editItem.fileUrl : null,
+      filePath: editMode && editItem ? editItem.filePath : null, // 🔥 Beholder filePath
+      fileType: editMode && editItem ? editItem.fileType : null,
     };
-
+  
     try {
       let result;
       if (editMode && editItem) {
         // Oppdater eksisterende media
-        result = await saveMedia({ id: editItem.id, ...mediaItem }, mediaFile || editItem.fileUrl);
-        if (result.success) {
-          const updatedMedia = media.map((item) =>
-            item.id === editItem.id ? { ...item, ...mediaItem } : item
-          );
-          setMedia(updatedMedia);
-        } else {
-          throw new Error(result.error);
-        }
+        result = await saveMedia({ id: editItem.id, ...mediaItem }, mediaFile);
       } else {
-        // Legg til ny media
+        // Lagre nytt media
         result = await saveMedia(mediaItem, mediaFile);
-        if (result.success) {
-          const updatedMedia = [...media, { id: result.id, ...mediaItem }];
-          setMedia(updatedMedia);
-        } else {
-          throw new Error(result.error);
-        }
       }
+  
+      if (result.success) {
+        // Oppdater media-listen for å vise den nyeste versjonen
+        const updatedMedia = await getAllMedia();
+        setMedia(updatedMedia);
+      }
+  
       resetForm();
     } catch (error) {
       console.error("Feil ved lagring av media:", error);
       alert("Noe gikk galt ved lagring av media. Prøv igjen.");
     }
   };
+  
+  
+  
+  
+  
+  
+  
 
   const resetForm = () => {
     setMediaTitle("");
-    setMediaDate("");
     setMediaDescription("");
     setMediaFile(null);
     setEditMode(false);
@@ -118,17 +129,7 @@ const Medier = () => {
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="mediaDate">Dato:</label>
-            <input
-              type="date"
-              id="mediaDate"
-              className="form-control"
-              value={mediaDate}
-              onChange={(e) => setMediaDate(e.target.value)}
-              required
-            />
-          </div>
+          
           <div className="form-group">
             <label htmlFor="mediaDescription">Beskrivelse:</label>
             <textarea
@@ -198,7 +199,7 @@ const Medier = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="mediaModalLabel">{selectedMedia?.title}</h5>
-              <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+              <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>

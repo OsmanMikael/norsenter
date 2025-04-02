@@ -15,7 +15,6 @@ const PrayerTimes = () => {
       try {
         const response = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Oslo&country=Norway&method=2&school=1&timezone=Europe/Oslo');
         const data = await response.json();
-        console.log('API Response:', data); // Log the entire response for debugging
 
         // Remove (CET) from timings using regex
         const timings = data.data.timings;
@@ -44,7 +43,6 @@ const PrayerTimes = () => {
     try {
       const response = await fetch(`https://api.aladhan.com/v1/calendarByCity?city=Oslo&country=Norway&method=2&school=1&month=${month}&year=${year}&timezone=Europe/Oslo`);
       const data = await response.json();
-      console.log('Monthly API Response:', data); // Log the entire response for debugging
 
       // Remove (CET) from monthly timings using regex
       const cleanedMonthlyTimings = data.data.map(day => {

@@ -3,18 +3,18 @@ import {
   getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject 
 } from "firebase/storage";
 import { 
-  getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc 
+  getFirestore, collection, addDoc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, doc 
 } from "firebase/firestore";
 import { 
   getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
 } from "firebase/auth";
 
-// Firebase-konfigurasjon
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyBSR0GVJvnGgi2y2tvHgqs2-75-pBZxS-w",
   authDomain: "nor-senter.firebaseapp.com",
   projectId: "nor-senter",
-  storageBucket: "nor-senter.appspot.com",
+  storageBucket: "nor-senter.firebasestorage.app",
   messagingSenderId: "181059608560",
   appId: "1:181059608560:web:f5076fa3c5111a4acd0735",
   measurementId: "G-CKQ54Y34CY"
@@ -122,10 +122,62 @@ const getAllMedia = async () => {
 };
 
 // Lagre ny medieoppføring
-const saveMedia = async (media) => {
-  const docRef = await addDoc(collection(db, "media"), media);
-  return { success: true, id: docRef.id };
+const saveMedia = async (media, file) => {
+  try {
+    let fileUrl = media.fileUrl || null;
+    let filePath = media.filePath || null;  // Beholder eksisterende filePath
+    let fileType = media.fileType || "unknown";
+
+    // Slett gammel fil fra Storage hvis en ny lastes opp
+    if (file && media.filePath && filePath !== media.filePath) {
+      const oldFileRef = ref(storage, media.filePath);
+      await deleteObject(oldFileRef).catch((error) => {
+        console.warn("Kunne ikke slette gammel fil:", error);
+      });
+    }
+
+    // Last opp ny fil hvis den finnes
+    if (file) {
+      filePath = `media/${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, filePath);
+      const uploadTask = await uploadBytesResumable(storageRef, file);
+      fileUrl = await getDownloadURL(uploadTask.ref);
+      fileType = file.type.split("/")[0];
+    }
+
+    if (media.id) {
+      // Oppdater eksisterende dokument i Firestore
+      const mediaRef = doc(db, "media", media.id);
+      await updateDoc(mediaRef, {
+        title: media.title,
+        date: media.date,
+        description: media.description,
+        fileUrl: fileUrl,
+        filePath: filePath,
+        fileType: fileType,
+      });
+
+      return { success: true, id: media.id, fileUrl };
+    } else {
+      // Opprett nytt dokument i Firestore
+      const docRef = await addDoc(collection(db, "media"), {
+        title: media.title,
+        date: media.date,
+        description: media.description,
+        fileUrl: fileUrl,
+        filePath: filePath,
+        fileType: fileType,
+      });
+
+      return { success: true, id: docRef.id, fileUrl };
+    }
+  } catch (error) {
+    console.error("Error saving media:", error);
+    return { success: false, error: error.message };
+  }
 };
+
+
 
 // Slett en medieoppføring fra Firestore og Storage
 const deleteMedia = async (id, filePath) => {
@@ -146,8 +198,41 @@ const deleteMedia = async (id, filePath) => {
   }
 };
 
+// ==================== ABOUT ====================
+
+// Hent About-teksten fra Firestore
+const getAboutText = async () => {
+  const aboutRef = doc(db, "content", "about");
+  const docSnap = await getDoc(aboutRef);
+
+  if (docSnap.exists()) {
+    return docSnap.data().text;
+  } else {
+    return ""; // Returnerer tom streng hvis dokumentet ikke finnes
+  }
+};
+
+// Oppdater About-teksten i Firestore
+
+// Oppdater eller opprett About-teksten i Firestore
+const updateAboutText = async (newText) => {
+  const aboutRef = doc(db, "content", "about");
+
+  try {
+    await setDoc(aboutRef, { text: newText }, { merge: true }); // 🔹 Oppretter dokumentet hvis det ikke finnes
+    return { success: true };
+  } catch (error) {
+    console.error("Feil ved oppdatering av About-teksten:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+
+export { getAboutText, updateAboutText };
+
+
 export { 
-  storage, db, auth, 
+  storage, db, auth, getDoc,
   collection, addDoc, getDocs, updateDoc, deleteDoc, doc, ref, 
   uploadBytesResumable, getDownloadURL, deleteObject, 
   getAllContacts, saveContact, updateContact, deleteContact, 

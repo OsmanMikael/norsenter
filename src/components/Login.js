@@ -17,10 +17,9 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      console.log('Innlogget:', user.email);
 
       // Hvis brukeren er admin (sjekk e-post eller rolle i Firestore)
-      if (user.email === 'ramiar987@gmail.com') {
+      if (user.email === 'norsenter18f@gmail.com') {
         setIsAdmin(true);
         navigate('/'); // Omdiriger til Hjem-siden
       } else {

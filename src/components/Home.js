@@ -49,7 +49,6 @@ const Home = () => {
           content,
         };
         updatedNews = [...news, newNews];
-        console.log("Saving new news item:", newNews); // Logg nyheten som legges til
         const result = await saveNews(newNews);
         if (result.success) {
           newNews.id = result.id; // Sett den genererte ID-en

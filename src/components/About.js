@@ -1,11 +1,86 @@
-// src/components/About.js
-import React from 'react';
+import React, { useState, useEffect } from "react";
+import { getDoc, doc } from "firebase/firestore";
+import { updateAboutText, db } from "./firebase"; // Husk å importere db fra firebase.js
+import { onAuthStateChanged, getAuth } from "firebase/auth";
 
 const About = () => {
+  const [aboutText, setAboutText] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Sjekk om brukeren er logget inn
+  const [loading, setLoading] = useState(true); // For å vise lastestatus mens vi henter teksten
+
+  useEffect(() => {
+    const auth = getAuth();
+
+    // Lytt etter endringer i autentiseringstilstand
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLoggedIn(true); // Brukeren er logget inn
+      } else {
+        setIsLoggedIn(false); // Brukeren er ikke logget inn
+      }
+    });
+
+    return () => unsubscribe(); // Rydd opp når komponenten avmonteres
+  }, []);
+
+  useEffect(() => {
+    // Hent About-tekst fra Firestore når komponenten er lastet
+    const fetchAboutText = async () => {
+      const docRef = doc(db, "content", "about"); // Referanse til dokumentet i Firestore
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setAboutText(docSnap.data().text); // Sett teksten til state
+      } else {
+        console.log("Ingen dokument funnet!");
+      }
+      setLoading(false); // Ferdig med å hente data
+    };
+
+    fetchAboutText();
+  }, []); // Denne effekten kjøres bare én gang når komponenten laster
+
+  const handleSave = async () => {
+    try {
+      const result = await updateAboutText(aboutText);
+      if (result.success) {
+        alert("About-tekst lagret!");
+      } else {
+        alert("Feil ved lagring av About-tekst.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Feil ved lagring av About-tekst.");
+    }
+  };
+
+  if (loading) {
+    return <p>Laster inn tekst...</p>; // Vist mens teksten lastes
+  }
+
   return (
-    <div className='about'>
+    <div className="about">
       <h2>Om Oss</h2>
-      <p>Informasjon om moskeen kommer her</p>
+      <p>{aboutText || "Informasjon om moskeen kommer her"}</p>
+
+      {/* Vis redigeringsknappen kun hvis brukeren er logget inn */}
+      {isLoggedIn && (
+        <div>
+          <textarea
+            value={aboutText}
+            onChange={(e) => setAboutText(e.target.value)}
+            placeholder="Skriv om oss her..."
+            style={{
+              width: "100%",
+              minHeight: "200px",
+              padding: "10px",
+              boxSizing: "border-box",
+            }}
+          />
+          <div>
+            <button onClick={handleSave}>Lagre</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
