@@ -12,7 +12,7 @@ import { FaWhatsapp } from "react-icons/fa"; // Importer WhatsApp-ikonet
 import './styles/main.css'; // Sørg for å importere hoved CSS-filen
 
 const App = () => {
-  const whatsappNumber = "+4712345678"; // Erstatt med riktig telefonnummer
+  const whatsappNumber = "+4792506096"; // Erstatt med riktig telefonnummer
 
   return (
     <Router>
