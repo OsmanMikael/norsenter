@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { sendPasswordResetEmail } from "firebase/auth"; // legg til øverst
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -34,6 +35,25 @@ const Login = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      alert("Skriv inn e-postadressen din først.");
+      return;
+    }
+
+    const auth = getAuth();
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert("En e-post for tilbakestilling av passord er sendt.");
+    } catch (error) {
+      console.error(
+        "Feil ved sending av tilbakestillings-e-post:",
+        error.message
+      );
+      alert("Kunne ikke sende e-post. Sjekk at e-posten er riktig.");
+    }
+  };
+
   return (
     <div className="container mt-4">
       <section className="login">
@@ -63,6 +83,13 @@ const Login = () => {
           </div>
           <button type="submit" className="btn btn-primary">
             Logg inn
+          </button>
+          <button
+            type="button"
+            className="btn btn-link mt-2"
+            onClick={handleForgotPassword}
+          >
+            Glemt passord?
           </button>
         </form>
       </section>
