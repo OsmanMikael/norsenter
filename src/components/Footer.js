@@ -2,9 +2,10 @@ import React from "react";
 import { FaInstagram, FaFacebook, FaYoutube } from "react-icons/fa";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
   return (
     <footer className="custom-footer">
-      <p>© 2025 Nor Senter</p>
+      <p>© {currentYear} Nor Senter</p>
       
       <div className="social-icons">
         <a href="https://instagram.com/norsenterinoslo/" target="_blank" rel="noopener noreferrer">
