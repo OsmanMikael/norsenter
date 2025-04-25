@@ -232,7 +232,7 @@ export { getAboutText, updateAboutText };
 
 
 export { 
-  storage, db, auth, getDoc,
+  storage, db, auth, getDoc, setDoc,
   collection, addDoc, getDocs, updateDoc, deleteDoc, doc, ref, 
   uploadBytesResumable, getDownloadURL, deleteObject, 
   getAllContacts, saveContact, updateContact, deleteContact, 
