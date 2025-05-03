@@ -1,10 +1,9 @@
-// src/components/Header.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import logo from '../assets/norsenter.png'; 
+import { useAuth } from '../context/AuthContext.tsx';
+import logo from '../assets/norsenter.png';
 
-const Header = () => {
+const Header: React.FC = () => {
   const { isAdmin, logout } = useAuth();
 
   return (
@@ -12,7 +11,7 @@ const Header = () => {
       <nav className="navbar navbar-expand-lg navbar-light bg-custom">
         <div className="container">
           <Link className="navbar-brand" to="/">
-            <img src={logo} alt="Nor Senter Logo" width="50" height="50" className="d-inline-block align-top mr-2 "/>
+            <img src={logo} alt="Nor Senter Logo" width="50" height="50" className="d-inline-block align-top mr-2 " />
             Nor Senter
           </Link>
           <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

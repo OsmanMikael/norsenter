@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import PrayerTimes from "./PrayerTimes";
+import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
+import { useAuth } from "../context/AuthContext.tsx";
+import PrayerTimes from "./PrayerTimes.tsx";
 import { FaWhatsapp } from "react-icons/fa";
-import Donations from "./Donations";
-import Medier from "./Media";
-import { getAllNews, saveNews, deleteNews } from "./firebase";
+import Donations from "./Donations.tsx";
+import Medier from "./Medier.tsx";
+import { getAllNews, saveNews, deleteNews } from "./firebase.tsx";
+import { NewsItem } from "../types/Types.tsx";
 
-const Home = () => {
+const Home: React.FC = () => {
   const { isAdmin } = useAuth();
   const whatsappNumber = "+4792506096";
 
-  const [news, setNews] = useState([]);
-  const [title, setTitle] = useState("");
-  const [date, setDate] = useState("");
-  const [content, setContent] = useState("");
-  const [editMode, setEditMode] = useState(false);
-  const [editItem, setEditItem] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [title, setTitle] = useState<string>("");
+  const [date, setDate] = useState<string>("");
+  const [content, setContent] = useState<string>("");
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editItem, setEditItem] = useState<NewsItem | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -30,30 +31,34 @@ const Home = () => {
     fetchNews();
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    let updatedNews;
 
     try {
       if (editMode && editItem) {
-        updatedNews = news.map((item) =>
-          item.id === editItem.id ? { ...item, title, date, content } : item
+        const updatedItem = { id: editItem.id, title, date, content };
+        await saveNews(updatedItem);
+        const updatedNews = news.map((item) =>
+          item.id === editItem.id ? updatedItem : item
         );
-        await saveNews({ id: editItem.id, title, date, content });
+        setNews(updatedNews);
       } else {
-        const newNews = { title, date, content };
-        updatedNews = [...news, newNews];
+        const newNews: Omit<NewsItem, "id"> = { title, date, content };
         const result = await saveNews(newNews);
-        if (result.success) newNews.id = result.id;
+        if (result.success && result.id) {
+          setNews([...news, { ...newNews, id: result.id }]);
+        }
       }
-      setNews(updatedNews);
     } catch (error) {
       console.error("Error saving news:", error);
     } finally {
       setLoading(false);
+      resetForm();
     }
+  };
 
+  const resetForm = () => {
     setEditMode(false);
     setEditItem(null);
     setTitle("");
@@ -61,7 +66,7 @@ const Home = () => {
     setContent("");
   };
 
-  const handleEdit = (item) => {
+  const handleEdit = (item: NewsItem) => {
     setTitle(item.title);
     setDate(item.date);
     setContent(item.content);
@@ -69,12 +74,11 @@ const Home = () => {
     setEditItem(item);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     setLoading(true);
     try {
       await deleteNews(id);
-      const updatedNews = news.filter((item) => item.id !== id);
-      setNews(updatedNews);
+      setNews(news.filter((item) => item.id !== id));
     } catch (error) {
       console.error("Error deleting news:", error);
     } finally {
@@ -87,6 +91,7 @@ const Home = () => {
       <aside className="sidebar">
         <Donations />
       </aside>
+
       <div className="main-content">
         <h2 className="velkommen">Velkommen til Nor Senter</h2>
         <PrayerTimes />
@@ -103,10 +108,11 @@ const Home = () => {
                   id="title"
                   className="form-control"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
                   required
                 />
               </div>
+
               <div className="form-group">
                 <label htmlFor="date">Dato:</label>
                 <input
@@ -114,27 +120,30 @@ const Home = () => {
                   id="date"
                   className="form-control"
                   value={date}
-                  onChange={(e) => setDate(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setDate(e.target.value)}
                   required
                 />
               </div>
+
               <div className="form-group">
                 <label htmlFor="content">Kommentar:</label>
                 <textarea
                   id="content"
                   className="form-control"
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
                   required
                 ></textarea>
               </div>
+
               <button
                 type="submit"
                 className="btn btn-primary"
                 disabled={loading}
               >
-                {editMode && editItem ? "Oppdater nyhet" : "Legg til nyhet"}
+                {editMode ? "Oppdater nyhet" : "Legg til nyhet"}
               </button>
+
               {loading && (
                 <div className="spinner-border mt-2" role="status">
                   <span className="sr-only">Laster...</span>
@@ -142,6 +151,7 @@ const Home = () => {
               )}
             </form>
           )}
+
           <div className="row">
             {news.map((item) => (
               <div key={item.id} className="col-md-4 mb-4">
@@ -162,7 +172,7 @@ const Home = () => {
                         </button>
                         <button
                           className="btn btn-danger"
-                          onClick={() => handleDelete(item.id)}
+                          onClick={() => handleDelete(item.id!)}
                         >
                           Slett
                         </button>
@@ -184,7 +194,7 @@ const Home = () => {
               width="100%"
               height="450"
               style={{ border: 0 }}
-              allowFullScreen=""
+              allowFullScreen
               loading="lazy"
             ></iframe>
           </div>

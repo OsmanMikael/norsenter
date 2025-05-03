@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import { getAllMedia, saveMedia, deleteMedia } from './firebase'; // Importer Firebase-funksjoner
-import { Modal } from 'bootstrap';
+import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
+import { useAuth } from "../context/AuthContext.tsx";
+import { getAllMedia, saveMedia, deleteMedia } from "./firebase.tsx";
+import { Modal } from "bootstrap";
+import { MediaItem } from "../types/Types.tsx";
 
-const Medier = () => {
-  const [media, setMedia] = useState([]);
-  const [mediaTitle, setMediaTitle] = useState("");
-  const [mediaDate, setMediaDate] = useState("");
-  const [mediaDescription, setMediaDescription] = useState("");
-  const [mediaFile, setMediaFile] = useState(null);
-  const [selectedMedia, setSelectedMedia] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [editItem, setEditItem] = useState(null);
+const Medier: React.FC = () => {
+  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [mediaTitle, setMediaTitle] = useState<string>("");
+  const [mediaDate, setMediaDate] = useState<string>("");
+  const [mediaDescription, setMediaDescription] = useState<string>("");
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editItem, setEditItem] = useState<MediaItem | null>(null);
   const { isAdmin } = useAuth();
 
-  // Hent media fra Firestore ved montering
   useEffect(() => {
     const fetchMedia = async () => {
       try {
@@ -27,83 +27,72 @@ const Medier = () => {
     fetchMedia();
   }, []);
 
-  const handleMediaEdit = (item) => {
-    setMediaTitle(item.title);
-    setMediaDate(item.date);
-    setMediaDescription(item.description);
+  const handleMediaEdit = (item: MediaItem) => {
+    setMediaTitle(item.title || "");
+    setMediaDate(item.date || "");
+    setMediaDescription(item.description || "");
     setEditMode(true);
     setEditItem(item);
   };
 
-  const handleMediaDelete = async (id, fileUrl) => {
+  const handleMediaDelete = async (id: string, fileUrl: string) => {
     try {
       await deleteMedia(id, fileUrl);
-      const updatedMedia = media.filter((item) => item.id !== id);
-      setMedia(updatedMedia);
+      setMedia(media.filter((item) => item.id !== id));
     } catch (error) {
       console.error("Feil ved sletting av media:", error);
       alert("Noe gikk galt ved sletting av media. Prøv igjen.");
     }
   };
 
-  
-
-  const handleMediaClick = (item) => {
+  const handleMediaClick = (item: MediaItem) => {
     setSelectedMedia(item);
     const modalElement = document.getElementById("mediaModal");
-    const modal = Modal.getInstance(modalElement) || new Modal(modalElement);
-    modal.show();
+    if (modalElement) {
+      const modal = Modal.getInstance(modalElement) || new Modal(modalElement);
+      modal.show();
+    }
   };
-  
 
-
-  const handleMediaSubmit = async (e) => {
+  const handleMediaSubmit = async (e: FormEvent) => {
     e.preventDefault();
-  
+
     if (!mediaFile && !editMode) {
       console.error("Ingen fil valgt, og vi er ikke i redigeringsmodus.");
       return;
     }
-  
-    // Bruk eksisterende fileUrl og filePath hvis ingen ny fil lastes opp
-    const mediaItem = {
+
+    const mediaItem: Partial<MediaItem> = {
       title: mediaTitle,
       date: mediaDate,
       description: mediaDescription,
-      fileUrl: editMode && editItem ? editItem.fileUrl : null,
-      filePath: editMode && editItem ? editItem.filePath : null, // 🔥 Beholder filePath
-      fileType: editMode && editItem ? editItem.fileType : null,
+      fileUrl: editMode && editItem ? editItem.fileUrl : undefined,
+      filePath: editMode && editItem ? editItem.filePath : undefined,
+      fileType: editMode && editItem ? editItem.fileType : undefined,
     };
-  
+
     try {
       let result;
-      if (editMode && editItem) {
-        // Oppdater eksisterende media
-        result = await saveMedia({ id: editItem.id, ...mediaItem }, mediaFile);
+      if (editMode && editItem?.id) {
+        result = await saveMedia(
+          { id: editItem.id, ...mediaItem },
+          mediaFile || undefined
+        );
       } else {
-        // Lagre nytt media
-        result = await saveMedia(mediaItem, mediaFile);
+        result = await saveMedia(mediaItem, mediaFile || undefined);
       }
-  
+
       if (result.success) {
-        // Oppdater media-listen for å vise den nyeste versjonen
         const updatedMedia = await getAllMedia();
         setMedia(updatedMedia);
       }
-  
+
       resetForm();
     } catch (error) {
       console.error("Feil ved lagring av media:", error);
       alert("Noe gikk galt ved lagring av media. Prøv igjen.");
     }
   };
-  
-  
-  
-  
-  
-  
-  
 
   const resetForm = () => {
     setMediaTitle("");
@@ -129,7 +118,7 @@ const Medier = () => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="mediaDescription">Beskrivelse:</label>
             <textarea
@@ -140,17 +129,23 @@ const Medier = () => {
               required
             ></textarea>
           </div>
+
           <div className="form-group">
             <label htmlFor="mediaFile">Fil:</label>
             <input
               type="file"
               id="mediaFile"
               className="form-control"
-              onChange={(e) => setMediaFile(e.target.files[0])}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                if (e.target.files && e.target.files[0]) {
+                  setMediaFile(e.target.files[0]);
+                }
+              }}
               accept="image/*,video/*"
               required={!editMode}
             />
           </div>
+
           <button type="submit" className="btn btn-primary">
             {editMode ? "Oppdater media" : "Last opp"}
           </button>
@@ -179,10 +174,18 @@ const Medier = () => {
                 <p className="card-text">{item.description}</p>
                 {isAdmin && (
                   <>
-                    <button className="btn btn-secondary mr-2" onClick={() => handleMediaEdit(item)}>
+                    <button
+                      className="btn btn-secondary mr-2"
+                      onClick={() => handleMediaEdit(item)}
+                    >
                       Rediger
                     </button>
-                    <button className="btn btn-danger" onClick={() => handleMediaDelete(item.id, item.fileUrl)}>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() =>
+                        handleMediaDelete(item.id!, item.filePath ?? "")
+                      }
+                    >
                       Slett
                     </button>
                   </>
@@ -193,19 +196,40 @@ const Medier = () => {
         ))}
       </div>
 
-      {/* Modal for visning */}
-      <div className="modal fade" id="mediaModal" tabIndex="-1" role="dialog" aria-labelledby="mediaModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
+      {/* Modal */}
+      <div
+        className="modal fade"
+        id="mediaModal"
+        tabIndex={-1}
+        role="dialog"
+        aria-labelledby="mediaModalLabel"
+        aria-hidden="true"
+      >
+        <div
+          className="modal-dialog modal-dialog-centered modal-lg"
+          role="document"
+        >
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="mediaModalLabel">{selectedMedia?.title}</h5>
-              <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
+              <h5 className="modal-title" id="mediaModalLabel">
+                {selectedMedia?.title}
+              </h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div className="modal-body">
               {selectedMedia?.fileType === "image" ? (
-                <img src={selectedMedia?.fileUrl} className="img-fluid fixed-media-size" alt={selectedMedia?.title} />
+                <img
+                  src={selectedMedia?.fileUrl}
+                  className="img-fluid fixed-media-size"
+                  alt={selectedMedia?.title}
+                />
               ) : (
                 <video controls className="custom-video fixed-media-size">
                   <source src={selectedMedia?.fileUrl} type="video/mp4" />

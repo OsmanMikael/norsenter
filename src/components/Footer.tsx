@@ -1,8 +1,9 @@
 import React from "react";
 import { FaInstagram, FaFacebook, FaYoutube } from "react-icons/fa";
 
-const Footer = () => {
+const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  
   return (
     <footer className="custom-footer">
       <p>© {currentYear} Nor Senter</p>

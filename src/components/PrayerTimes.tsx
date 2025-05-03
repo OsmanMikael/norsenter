@@ -1,14 +1,31 @@
 import React, { useState, useEffect } from 'react';
 
-const PrayerTimes = () => {
-  const [prayerTimes, setPrayerTimes] = useState({});
-  const [monthlyPrayerTimes, setMonthlyPrayerTimes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [date, setDate] = useState('');
-  const [showMonthly, setShowMonthly] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
-  const [year] = useState(new Date().getFullYear());
+// Definer typer for API-svaret
+interface PrayerTimesData {
+  Fajr: string;
+  Sunrise: string;
+  Dhuhr: string;
+  Asr: string;
+  Maghrib: string;
+  Isha: string;
+}
+
+interface MonthlyPrayerDay {
+  date: {
+    readable: string;
+  };
+  timings: PrayerTimesData;
+}
+
+const PrayerTimes: React.FC = () => {
+  const [prayerTimes, setPrayerTimes] = useState<PrayerTimesData>({} as PrayerTimesData);
+  const [monthlyPrayerTimes, setMonthlyPrayerTimes] = useState<MonthlyPrayerDay[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [date, setDate] = useState<string>('');
+  const [showMonthly, setShowMonthly] = useState<boolean>(false);
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+  const [year] = useState<number>(new Date().getFullYear());
 
   useEffect(() => {
     const fetchPrayerTimes = async () => {
@@ -18,10 +35,10 @@ const PrayerTimes = () => {
 
         // Remove (CET) from timings using regex
         const timings = data.data.timings;
-        const cleanedTimings = {};
+        const cleanedTimings: PrayerTimesData = {} as PrayerTimesData;
         for (const key in timings) {
           if (timings.hasOwnProperty(key)) {
-            cleanedTimings[key] = timings[key].replace(/ \([A-Z]+\)/g, '');
+            cleanedTimings[key as keyof PrayerTimesData] = timings[key].replace(/ \([A-Z]+\)/g, '');
           }
         }
 
@@ -30,7 +47,7 @@ const PrayerTimes = () => {
         setLoading(false);
       } catch (err) {
         console.error('API Error:', err); // Log the error for debugging
-        setError(err.message);
+        setError((err as Error).message);
         setLoading(false);
       }
     };
@@ -38,18 +55,18 @@ const PrayerTimes = () => {
     fetchPrayerTimes();
   }, []);
 
-  const fetchMonthlyPrayerTimes = async (month) => {
+  const fetchMonthlyPrayerTimes = async (month: number) => {
     setLoading(true);
     try {
       const response = await fetch(`https://api.aladhan.com/v1/calendarByCity?city=Oslo&country=Norway&method=2&school=1&month=${month}&year=${year}&timezone=Europe/Oslo`);
       const data = await response.json();
 
       // Remove (CET) from monthly timings using regex
-      const cleanedMonthlyTimings = data.data.map(day => {
-        const cleanedDayTimings = {};
+      const cleanedMonthlyTimings = data.data.map((day: any) => {
+        const cleanedDayTimings: PrayerTimesData = {} as PrayerTimesData;
         for (const key in day.timings) {
           if (day.timings.hasOwnProperty(key)) {
-            cleanedDayTimings[key] = day.timings[key].replace(/ \([A-Z]+\)/g, '');
+            cleanedDayTimings[key as keyof PrayerTimesData] = day.timings[key].replace(/ \([A-Z]+\)/g, '');
           }
         }
         return {
@@ -63,13 +80,13 @@ const PrayerTimes = () => {
       setLoading(false);
     } catch (err) {
       console.error('API Error:', err); // Log the error for debugging
-      setError(err.message);
+      setError((err as Error).message);
       setLoading(false);
     }
   };
 
-  const handleMonthChange = (event) => {
-    const month = event.target.value;
+  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const month = parseInt(event.target.value);
     setSelectedMonth(month);
     fetchMonthlyPrayerTimes(month);
   };
@@ -117,7 +134,7 @@ const PrayerTimes = () => {
                 <td>{prayerTimes.Maghrib}</td>
               </tr>
               <tr>
-                                <td>Isha</td>
+                <td>Isha</td>
                 <td>{prayerTimes.Isha}</td>
               </tr>
             </tbody>
