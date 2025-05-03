@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useAuth } from "../context/AuthContext.tsx";
+import { getAuth, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
 import { sendPasswordResetEmail } from "firebase/auth"; // legg til øverst
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const { setIsAdmin } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const auth = getAuth();
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      const userCredential: UserCredential = await signInWithEmailAndPassword(
         auth,
         email,
         password
@@ -29,7 +29,7 @@ const Login = () => {
       } else {
         alert("Du har ikke admin-tilgang");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Feil ved innlogging:", error.message);
       alert("Feil e-post eller passord.");
     }
@@ -45,7 +45,7 @@ const Login = () => {
     try {
       await sendPasswordResetEmail(auth, email);
       alert("En e-post for tilbakestilling av passord er sendt.");
-    } catch (error) {
+    } catch (error: any) {
       console.error(
         "Feil ved sending av tilbakestillings-e-post:",
         error.message

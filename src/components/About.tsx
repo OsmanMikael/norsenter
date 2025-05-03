@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { getDoc, doc } from "firebase/firestore";
-import { updateAboutText, db } from "./firebase"; // Husk å importere db fra firebase.js
-import { onAuthStateChanged, getAuth } from "firebase/auth";
+import { updateAboutText, db } from "./firebase.tsx"; // Husk å importere db fra firebase.js
+import { onAuthStateChanged, getAuth, User } from "firebase/auth";
 
-const About = () => {
-  const [aboutText, setAboutText] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Sjekk om brukeren er logget inn
-  const [loading, setLoading] = useState(true); // For å vise lastestatus mens vi henter teksten
+// Typing for komponentens tilstand
+interface AboutProps {}
+
+const About: React.FC<AboutProps> = () => {
+  const [aboutText, setAboutText] = useState<string>("");
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // Sjekk om brukeren er logget inn
+  const [loading, setLoading] = useState<boolean>(true); // For å vise lastestatus mens vi henter teksten
 
   useEffect(() => {
     const auth = getAuth();
 
     // Lytt etter endringer i autentiseringstilstand
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
       if (user) {
         setIsLoggedIn(true); // Brukeren er logget inn
       } else {

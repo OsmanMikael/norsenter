@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from "react";
 import vipps from "../assets/vipps.png";
-import { useAuth } from "../context/AuthContext";
-import { db, doc, getDoc, setDoc } from "./firebase";
+import { useAuth } from "../context/AuthContext.tsx";
+import { db, doc, getDoc, setDoc } from "./firebase.tsx";
 
-const Donations = () => {
+// Definer typer for donasjonsdataene
+interface DonationInfo {
+  vippsNumber: string;
+  accountNumber: string;
+  ibanNumber: string;
+  swiftNumber: string;
+  bankName: string;
+  message: string;
+}
+
+const Donations: React.FC = () => {
   const { isAdmin } = useAuth();
 
-  const [vippsNumber, setVippsNumber] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [ibanNumber, setIbanNumber] = useState("");
-  const [swiftNumber, setSwiftNumber] = useState("");
-  const [bankName, setBankName] = useState("");
-  const [message, setMessage] = useState("");
-  const [editing, setEditing] = useState(false);
+  const [vippsNumber, setVippsNumber] = useState<string>("");
+  const [accountNumber, setAccountNumber] = useState<string>("");
+  const [ibanNumber, setIbanNumber] = useState<string>("");
+  const [swiftNumber, setSwiftNumber] = useState<string>("");
+  const [bankName, setBankName] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [editing, setEditing] = useState<boolean>(false);
 
   // 🔹 Last inn eksisterende donasjonsdata fra Firestore
   useEffect(() => {
@@ -20,7 +30,7 @@ const Donations = () => {
       const docRef = doc(db, "content", "donationInfo");
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        const data = docSnap.data();
+        const data = docSnap.data() as DonationInfo; // Bruk typen DonationInfo for data
         setVippsNumber(data.vippsNumber || "");
         setAccountNumber(data.accountNumber || "");
         setIbanNumber(data.ibanNumber || "");

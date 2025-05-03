@@ -1,11 +1,11 @@
-import { useState, useEffect, createContext, useContext } from 'react';
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import { getAuth, onAuthStateChanged, signOut, User } from 'firebase/auth';
 
-const AuthContext = createContext();
+const AuthContext = createContext<any>(undefined);
 
-export const AuthProvider = ({ children }) => {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [user, setUser] = useState(null);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const auth = getAuth();

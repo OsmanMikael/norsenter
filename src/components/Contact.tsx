@@ -1,60 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { getAllContacts, saveContact, updateContact, deleteContact } from './firebase';
+import { useAuth } from '../context/AuthContext.tsx';
+import { getAllContacts, saveContact, updateContact, deleteContact } from './firebase.tsx';
+import { ContactItem } from '../types/Types.tsx';
 
 const Contact = () => {
   const { isAdmin } = useAuth();
-  const [contacts, setContacts] = useState([]);
-  const [address, setAddress] = useState('Nedre Rommen 7a, 0988 Oslo, Norge');
-  const [email, setEmail] = useState('norsenter18f@gmail.com');
-  
-  const [editing, setEditing] = useState(false);
-  const [editContact, setEditContact] = useState(null);
 
-  // 🔹 Hent kontakter fra Firestore
+  const [contacts, setContacts] = useState<ContactItem[]>([]);
+  const [address, setAddress] = useState<string>('Nedre Rommen 7a, 0988 Oslo, Norge');
+  const [email, setEmail] = useState<string>('norsenter18f@gmail.com');
+
+  const [editing, setEditing] = useState<boolean>(false);
+  const [editContact, setEditContact] = useState<ContactItem | null>(null);
+
+  // Hent kontakter fra Firestore
   useEffect(() => {
     const fetchContacts = async () => {
-      const storedContacts = await getAllContacts();
+      const storedContacts: ContactItem[] = await getAllContacts();
       setContacts(storedContacts);
     };
     fetchContacts();
   }, []);
 
-  // 🔹 Toggle redigering
-  const handleEditToggle = (contact) => {
+  // Toggle redigering
+  const handleEditToggle = (contact: ContactItem) => {
     setEditContact(contact);
   };
 
-  // 🔹 Lagre ny eller oppdatert kontakt
+  // Lagre ny eller oppdatert kontakt
   const handleSave = async () => {
-    if (!editContact.name || !editContact.phone) {
+    if (!editContact?.name || !editContact?.phone) {
       alert("Vennligst fyll inn alle felt!");
       return;
     }
 
     if (editContact.id) {
-      // 🔹 Oppdater eksisterende kontakt
-      await updateContact(editContact.id, { name: editContact.name, phone: editContact.phone });
+      await updateContact(editContact.id, {
+        name: editContact.name,
+        phone: editContact.phone,
+      });
 
-      // 🔹 Oppdater kontaktlisten i state
-      setContacts(contacts.map(c => (c.id === editContact.id ? { ...c, ...editContact } : c)));
+      setContacts(
+        contacts.map((c) => (c.id === editContact.id ? { ...c, ...editContact } : c))
+      );
     } else {
-      // 🔹 Lag ny kontakt
-      const newId = await saveContact(editContact); // Lagre kontakt og få ID fra Firestore
+      const newId = await saveContact(editContact);
       setContacts([...contacts, { id: newId, ...editContact }]);
     }
 
     setEditContact(null);
   };
 
-  // 🔹 Slett kontakt
-  const handleDelete = async (id) => {
+  // Slett kontakt
+  const handleDelete = async (id?: string) => {
     if (!id) {
       console.error("Contact ID is null or undefined");
       return;
     }
     await deleteContact(id);
-    setContacts(contacts.filter(contact => contact.id !== id));
+    setContacts(contacts.filter((contact) => contact.id !== id));
   };
 
   return (
@@ -130,7 +134,9 @@ const Contact = () => {
                 id="name"
                 className="form-control"
                 value={editContact.name}
-                onChange={(e) => setEditContact({ ...editContact, name: e.target.value })}
+                onChange={(e) =>
+                  setEditContact({ ...editContact, name: e.target.value })
+                }
               />
             </div>
             <div className="form-group">
@@ -140,11 +146,20 @@ const Contact = () => {
                 id="phone"
                 className="form-control"
                 value={editContact.phone}
-                onChange={(e) => setEditContact({ ...editContact, phone: e.target.value })}
+                onChange={(e) =>
+                  setEditContact({ ...editContact, phone: e.target.value })
+                }
               />
             </div>
-            <button className="btn btn-success" onClick={handleSave}>Lagre</button>
-            <button className="btn btn-secondary ml-2" onClick={() => setEditContact(null)}>Avbryt</button>
+            <button className="btn btn-success" onClick={handleSave}>
+              Lagre
+            </button>
+            <button
+              className="btn btn-secondary ml-2"
+              onClick={() => setEditContact(null)}
+            >
+              Avbryt
+            </button>
           </div>
         )}
       </section>
@@ -158,7 +173,7 @@ const Contact = () => {
             width="100%"
             height="450"
             style={{ border: 0 }}
-            allowFullScreen=""
+            allowFullScreen
             loading="lazy"
           ></iframe>
         </div>
