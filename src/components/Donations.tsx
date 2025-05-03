@@ -85,13 +85,20 @@ const Donations: React.FC = () => {
 
         <div className="donation-section">
           <div className="alert alert-info">
-            <img
-              src={vipps}
-              alt="Vipps Logo"
-              width="30"
-              height="30"
-              className="d-inline-block mr-2"
-            />
+            <a
+              href="vipps://pay?recipient=521322"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src={vipps}
+                alt="Vipps Logo"
+                width="40"
+                height="30"
+                className="d-inline-block mr-2"
+                style={{ cursor: "pointer" }}
+              />
+            </a>
             <strong>Vipps:</strong>{" "}
             {editing ? (
               <input
