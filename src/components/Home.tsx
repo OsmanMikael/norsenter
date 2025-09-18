@@ -88,10 +88,6 @@ const Home: React.FC = () => {
 
   return (
     <div className="home-layout">
-      <aside className="sidebar">
-        <Donations />
-      </aside>
-
       <div className="main-content">
         <h2 className="velkommen">Velkommen til Nor Senter</h2>
         <PrayerTimes />
@@ -108,7 +104,9 @@ const Home: React.FC = () => {
                   id="title"
                   className="form-control"
                   value={title}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setTitle(e.target.value)
+                  }
                   required
                 />
               </div>
@@ -120,7 +118,9 @@ const Home: React.FC = () => {
                   id="date"
                   className="form-control"
                   value={date}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setDate(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setDate(e.target.value)
+                  }
                   required
                 />
               </div>
@@ -131,7 +131,9 @@ const Home: React.FC = () => {
                   id="content"
                   className="form-control"
                   value={content}
-                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                    setContent(e.target.value)
+                  }
                   required
                 ></textarea>
               </div>
@@ -200,7 +202,9 @@ const Home: React.FC = () => {
           </div>
         </section>
       </div>
-
+      <aside className="sidebar">
+        <Donations />
+      </aside>
       <a
         href={`https://wa.me/${whatsappNumber}`}
         target="_blank"
