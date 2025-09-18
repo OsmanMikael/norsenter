@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-// Definer typer for API-svaret
+// Typer for API-svaret
 interface PrayerTimesData {
   Fajr: string;
   Sunrise: string;
@@ -37,6 +37,7 @@ const PrayerTimes: React.FC = () => {
   const [nextPrayer, setNextPrayer] = useState<string>("");
   const [timeLeft, setTimeLeft] = useState<string>("");
 
+  // Hent dagens bønnetider
   useEffect(() => {
     const fetchPrayerTimes = async () => {
       try {
@@ -45,7 +46,7 @@ const PrayerTimes: React.FC = () => {
         );
         const data = await response.json();
 
-        // Fjern (CET) fra timings med regex
+        // Fjern (CET) fra tider
         const timings = data.data.timings;
         const cleanedTimings: PrayerTimesData = {} as PrayerTimesData;
         for (const key in timings) {
@@ -70,7 +71,7 @@ const PrayerTimes: React.FC = () => {
     fetchPrayerTimes();
   }, []);
 
-  // Hjelpefunksjon: finn neste bønn og tid igjen
+  // Nedtelling til neste bønn
   useEffect(() => {
     if (!prayerTimes || !prayerTimes.Fajr) return;
 
@@ -85,7 +86,7 @@ const PrayerTimes: React.FC = () => {
         { name: "Isha", time: prayerTimes.Isha },
       ];
 
-      // Konverter til dato-objekter
+      // Konverter til dato-objekter for i dag
       const todayPrayers = prayerOrder.map((p) => {
         const [hour, minute] = p.time.split(":").map(Number);
         const d = new Date(now);
@@ -94,7 +95,17 @@ const PrayerTimes: React.FC = () => {
       });
 
       // Finn neste bønn
-      const next = todayPrayers.find((p) => p.date > now) || todayPrayers[0]; // hvis alle er passert, ta første (neste dag)
+      let next = todayPrayers.find((p) => p.date > now);
+
+      if (!next) {
+        // Alle dagens bønner er passert → neste bønn er Fajr neste dag
+        const [hour, minute] = prayerTimes.Fajr.split(":").map(Number);
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(hour, minute, 0, 0);
+        next = { name: "Fajr", time: prayerTimes.Fajr, date: tomorrow };
+      }
+
       setNextPrayer(next.name);
 
       // Beregn tid igjen
@@ -107,10 +118,11 @@ const PrayerTimes: React.FC = () => {
     };
 
     updateCountdown();
-    const timer = setInterval(updateCountdown, 1000); // oppdater hvert sekund
+    const timer = setInterval(updateCountdown, 1000);
     return () => clearInterval(timer);
   }, [prayerTimes]);
 
+  // Hent månedlige bønnetider
   const fetchMonthlyPrayerTimes = async (month: number) => {
     setLoading(true);
     try {
@@ -213,18 +225,11 @@ const PrayerTimes: React.FC = () => {
           <h3>Bønnetider for hele måneden</h3>
           <label htmlFor="month">Velg måned:</label>
           <select id="month" value={selectedMonth} onChange={handleMonthChange}>
-            <option value="1">Januar</option>
-            <option value="2">Februar</option>
-            <option value="3">Mars</option>
-            <option value="4">April</option>
-            <option value="5">Mai</option>
-            <option value="6">Juni</option>
-            <option value="7">Juli</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10">Oktober</option>
-            <option value="11">November</option>
-            <option value="12">Desember</option>
+            {[...Array(12)].map((_, i) => (
+              <option key={i} value={i + 1}>
+                {new Date(year, i).toLocaleString("no-NO", { month: "long" })}
+              </option>
+            ))}
           </select>
           <table>
             <thead>
