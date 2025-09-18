@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 // Definer typer for API-svaret
 interface PrayerTimesData {
@@ -18,35 +18,50 @@ interface MonthlyPrayerDay {
 }
 
 const PrayerTimes: React.FC = () => {
-  const [prayerTimes, setPrayerTimes] = useState<PrayerTimesData>({} as PrayerTimesData);
-  const [monthlyPrayerTimes, setMonthlyPrayerTimes] = useState<MonthlyPrayerDay[]>([]);
+  const [prayerTimes, setPrayerTimes] = useState<PrayerTimesData>(
+    {} as PrayerTimesData
+  );
+  const [monthlyPrayerTimes, setMonthlyPrayerTimes] = useState<
+    MonthlyPrayerDay[]
+  >([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [date, setDate] = useState<string>('');
+  const [date, setDate] = useState<string>("");
   const [showMonthly, setShowMonthly] = useState<boolean>(false);
-  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+  const [selectedMonth, setSelectedMonth] = useState<number>(
+    new Date().getMonth() + 1
+  );
   const [year] = useState<number>(new Date().getFullYear());
+
+  // Nedtelling
+  const [nextPrayer, setNextPrayer] = useState<string>("");
+  const [timeLeft, setTimeLeft] = useState<string>("");
 
   useEffect(() => {
     const fetchPrayerTimes = async () => {
       try {
-        const response = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Oslo&country=Norway&method=2&school=1&timezone=Europe/Oslo');
+        const response = await fetch(
+          "https://api.aladhan.com/v1/timingsByCity?city=Oslo&country=Norway&method=2&school=1&timezone=Europe/Oslo"
+        );
         const data = await response.json();
 
-        // Remove (CET) from timings using regex
+        // Fjern (CET) fra timings med regex
         const timings = data.data.timings;
         const cleanedTimings: PrayerTimesData = {} as PrayerTimesData;
         for (const key in timings) {
           if (timings.hasOwnProperty(key)) {
-            cleanedTimings[key as keyof PrayerTimesData] = timings[key].replace(/ \([A-Z]+\)/g, '');
+            cleanedTimings[key as keyof PrayerTimesData] = timings[key].replace(
+              / \([A-Z]+\)/g,
+              ""
+            );
           }
         }
 
         setPrayerTimes(cleanedTimings);
-        setDate(data.data.date.readable); // Set the date from the API response
+        setDate(data.data.date.readable);
         setLoading(false);
       } catch (err) {
-        console.error('API Error:', err); // Log the error for debugging
+        console.error("API Error:", err);
         setError((err as Error).message);
         setLoading(false);
       }
@@ -55,18 +70,62 @@ const PrayerTimes: React.FC = () => {
     fetchPrayerTimes();
   }, []);
 
+  // Hjelpefunksjon: finn neste bønn og tid igjen
+  useEffect(() => {
+    if (!prayerTimes || !prayerTimes.Fajr) return;
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const prayerOrder: { name: string; time: string }[] = [
+        { name: "Fajr", time: prayerTimes.Fajr },
+        { name: "Sunrise", time: prayerTimes.Sunrise },
+        { name: "Dhuhr", time: prayerTimes.Dhuhr },
+        { name: "Asr", time: prayerTimes.Asr },
+        { name: "Maghrib", time: prayerTimes.Maghrib },
+        { name: "Isha", time: prayerTimes.Isha },
+      ];
+
+      // Konverter til dato-objekter
+      const todayPrayers = prayerOrder.map((p) => {
+        const [hour, minute] = p.time.split(":").map(Number);
+        const d = new Date(now);
+        d.setHours(hour, minute, 0, 0);
+        return { ...p, date: d };
+      });
+
+      // Finn neste bønn
+      const next = todayPrayers.find((p) => p.date > now) || todayPrayers[0]; // hvis alle er passert, ta første (neste dag)
+      setNextPrayer(next.name);
+
+      // Beregn tid igjen
+      const diffMs = next.date.getTime() - now.getTime();
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+      setTimeLeft(`${hours}t ${minutes}m ${seconds}s`);
+    };
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000); // oppdater hvert sekund
+    return () => clearInterval(timer);
+  }, [prayerTimes]);
+
   const fetchMonthlyPrayerTimes = async (month: number) => {
     setLoading(true);
     try {
-      const response = await fetch(`https://api.aladhan.com/v1/calendarByCity?city=Oslo&country=Norway&method=2&school=1&month=${month}&year=${year}&timezone=Europe/Oslo`);
+      const response = await fetch(
+        `https://api.aladhan.com/v1/calendarByCity?city=Oslo&country=Norway&method=2&school=1&month=${month}&year=${year}&timezone=Europe/Oslo`
+      );
       const data = await response.json();
 
-      // Remove (CET) from monthly timings using regex
       const cleanedMonthlyTimings = data.data.map((day: any) => {
         const cleanedDayTimings: PrayerTimesData = {} as PrayerTimesData;
         for (const key in day.timings) {
           if (day.timings.hasOwnProperty(key)) {
-            cleanedDayTimings[key as keyof PrayerTimesData] = day.timings[key].replace(/ \([A-Z]+\)/g, '');
+            cleanedDayTimings[key as keyof PrayerTimesData] = day.timings[
+              key
+            ].replace(/ \([A-Z]+\)/g, "");
           }
         }
         return {
@@ -79,7 +138,7 @@ const PrayerTimes: React.FC = () => {
       setShowMonthly(true);
       setLoading(false);
     } catch (err) {
-      console.error('API Error:', err); // Log the error for debugging
+      console.error("API Error:", err);
       setError((err as Error).message);
       setLoading(false);
     }
@@ -91,18 +150,22 @@ const PrayerTimes: React.FC = () => {
     fetchMonthlyPrayerTimes(month);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="prayer-times">
       <h2>Bønnetider</h2>
-      <p>{date}</p> {/* Display the date here */}
+      <p>{date}</p>
+
+      {/* Nedtelling */}
+      {nextPrayer && (
+        <div className="countdown">
+          <h3>Neste bønn: {nextPrayer}</h3>
+          <p>Tid igjen: {timeLeft}</p>
+        </div>
+      )}
+
       {!showMonthly && (
         <>
           <table>
@@ -139,7 +202,9 @@ const PrayerTimes: React.FC = () => {
               </tr>
             </tbody>
           </table>
-          <button onClick={() => fetchMonthlyPrayerTimes(selectedMonth)}>Vis tider for hele måneden</button>
+          <button onClick={() => fetchMonthlyPrayerTimes(selectedMonth)}>
+            Vis tider for hele måneden
+          </button>
         </>
       )}
 
@@ -187,7 +252,9 @@ const PrayerTimes: React.FC = () => {
               ))}
             </tbody>
           </table>
-          <button onClick={() => setShowMonthly(false)}>Skjul månedlige tider</button>
+          <button onClick={() => setShowMonthly(false)}>
+            Skjul månedlige tider
+          </button>
         </div>
       )}
     </div>
