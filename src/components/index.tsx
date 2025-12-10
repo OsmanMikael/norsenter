@@ -1,0 +1,9 @@
+export { default as About } from "./About/About.tsx";
+export { default as Contact } from "./Contact/Contact.tsx";
+export { default as Donations } from "./Donations/Donations.tsx";
+export { default as Footer } from "./Footer/Footer.tsx";
+export { default as Header } from "./Header/Header.tsx";
+export { default as Home } from "./Home/Home.tsx";
+export { default as Login } from "./Login/Login.tsx";
+export { default as Medier } from "./Medier/Medier.tsx";
+export { default as PrayerTimes } from "./PrayerTimes/PrayerTimes.tsx";

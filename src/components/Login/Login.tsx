@@ -1,7 +1,12 @@
+import './Login.css'
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.tsx";
-import { getAuth, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
+import { useAuth } from "../../context/AuthContext.tsx";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  UserCredential,
+} from "firebase/auth";
 import { sendPasswordResetEmail } from "firebase/auth"; // legg til øverst
 
 const Login = () => {
@@ -86,7 +91,7 @@ const Login = () => {
           </button>
           <button
             type="button"
-            className="btn btn-link mt-2"
+            className="btn btn-secondery"
             onClick={handleForgotPassword}
           >
             Glemt passord?

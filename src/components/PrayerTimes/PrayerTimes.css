@@ -1,0 +1,113 @@
+.prayer-times {
+  background-color: var(--bg-card);
+  padding: var(--spacing);
+  margin: var(--spacing) auto;
+  max-width: calc(var(--spacing) * 30);
+  box-shadow: var(--shadow-default);
+  border-radius: var(--radius);
+}
+
+.prayer-times h2 {
+  text-align: center;
+  color: var(--color-primary);
+}
+
+.prayer-times table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing);
+}
+
+.prayer-times th,
+.prayer-times td {
+  padding: calc(var(--spacing) / 2);
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.prayer-times th {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.prayer-times tr:nth-child(even) {
+  background-color: var(--color-table-even);
+}
+
+.prayer-times tr:hover {
+  background-color: var(--color-table-hover);
+}
+
+.prayer-times p {
+  text-align: center;
+  font-size: 1.2em;
+  color: #555;
+  margin-top: -calc(var(--spacing) / 2);
+}
+
+/* delen for å style dropdown-menyen */
+select {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  padding: calc(var(--spacing) / 2);
+  margin: calc(var(--spacing) / 2) 0;
+  border: 1px solid #ddd;
+  border-radius: var(--radius);
+}
+
+/* --- Countdown-stil --- */
+.countdown {
+  background: linear-gradient(
+    135deg,
+    var(--color-secondary),
+    var(--color-primary)
+  );
+  color: var(--color-white) !important; /* Sørger for hvit tekst */
+  text-align: center;
+  padding: var(--spacing);
+  margin: var(--spacing) auto;
+  border-radius: var(--radius);
+  max-width: calc(var(--spacing) * 20);
+  box-shadow: var(--shadow-default);
+  animation: fadeIn 1s ease-in-out;
+}
+
+.countdown h3,
+.countdown p {
+  color: var(--color-white) !important;
+}
+
+.countdown h3 {
+  margin: 0 0 calc(var(--spacing) / 2);
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.countdown p {
+  font-size: 1.3em;
+  font-weight: 600;
+  color: var(--color-accent) !important; /* Fremhev tid med grønn aksent */
+  animation: pulse 2s infinite;
+}
+
+/* Enkel fade-in animasjon */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-calc(var(--spacing) / 2));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

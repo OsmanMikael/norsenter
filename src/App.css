@@ -1,0 +1,68 @@
+:root {
+  /* Colors */
+  --color-primary: #005f73;
+  --color-secondary: #0a9396;
+  --color-accent: #94d2bd;
+  --color-text: #333;
+  --color-white: #fff;
+  --color-table-even: #f4f4f4;
+  --color-table-hover: #e0f7fa;
+  --color-gold: gold;
+
+  /* Backgrounds */
+  --bg-card: var(--color-white);
+  --bg-info: #d9edf7;
+
+  /* Borders & Shadows */
+  --border-color-info: #bce8f1;
+  --shadow-default: 0 0 10px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.25);
+  --radius: 10px;
+
+  /* Fonts */
+  --font-main: Arial, sans-serif;
+
+  /* Sizes */
+  --spacing: 20px;
+}
+
+/* Gjør hele nettsiden mer lesbar med en jevn font */
+body {
+  font-family: var(--font-main);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  background-image: url(/src/assets/duhok1.webp);
+  color: var(--color-text);
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+/* Main content area */
+main {
+  padding: var(--spacing);
+  margin-bottom: calc(var(--spacing)*4); /* For å unngå at innholdet overlapper med footeren */
+}
+
+/* Gjør knappene mer attraktive */
+button {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--radius);
+  border-color: var(--color-secondary);
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-top: var(--spacing);
+  box-shadow: var(--shadow-default);
+}
+
+button:hover {
+  background-color: var(--color-accent);
+  color: black;
+}
+
+p {
+  margin-top: calc(var(--spacing)/2);
+  font-size: 1.1rem;
+}

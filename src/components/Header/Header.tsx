@@ -1,7 +1,8 @@
+import './Header.css'
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.tsx';
-import logo from '../assets/norsenter.png';
+import { useAuth } from '../../context/AuthContext.tsx';
+import logo from '../../assets/norsenter.png';
 
 const Header: React.FC = () => {
   const { isAdmin, logout } = useAuth();

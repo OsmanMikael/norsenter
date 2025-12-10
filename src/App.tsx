@@ -1,14 +1,17 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header.tsx';
-import Footer from './components/Footer.tsx';
-import Home from './components/Home.tsx';
-import About from './components/About.tsx';
-import Contact from './components/Contact.tsx';
-import PrayerTimes from './components/PrayerTimes.tsx';
-import Login from './components/Login.tsx';
-import { FaWhatsapp } from 'react-icons/fa'; // Importer WhatsApp-ikonet
-import './styles/main.css'; // Sørg for å importere hoved CSS-filen
+import "./App.css";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  Header,
+  Footer,
+  Home,
+  About,
+  Contact,
+  PrayerTimes,
+  Login,
+} from "./components/index.tsx";
+
+import { FaWhatsapp } from "react-icons/fa"; // Importer WhatsApp-ikonet
 
 // Hvis du ønsker å være mer eksplisitt om typen av whatsappNumber, kan du bruke en string:
 const App: React.FC = () => {

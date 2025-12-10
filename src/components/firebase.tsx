@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import {
-  getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject
+  getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject,
 } from "firebase/storage";
 import {
   getFirestore, collection, addDoc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, doc
@@ -11,8 +11,6 @@ import {
 
 import { ContactItem, NewsItem, MediaItem } from '../types/Types';
 
-
-// ==================== CONFIG ====================
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -23,15 +21,12 @@ const firebaseConfig = {
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
-
-// ==================== INITIALISERING ====================
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 
-
-// ==================== AUTENTISERING ====================
+// === AUTENTISERING ===
 const loginUser = async (email: string, password: string) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -54,7 +49,7 @@ const onAuthStateChange = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback);
 };
 
-// ==================== KONTAKTER ====================
+// === KONTAKTER ===
 const getAllContacts = async (): Promise<ContactItem[]> => {
   const snapshot = await getDocs(collection(db, "contacts"));
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as ContactItem));
@@ -70,13 +65,12 @@ const updateContact = async (id: string, data: Partial<ContactItem>) => {
   await updateDoc(contactRef, data);
 };
 
-
 const deleteContact = async (id: string) => {
   if (!id) return;
   await deleteDoc(doc(db, "contacts", id));
 };
 
-// ==================== NYHETER ====================
+// === NYHETER ===
 const getAllNews = async (): Promise<NewsItem[]> => {
   const snapshot = await getDocs(collection(db, "news"));
   return snapshot.docs.map((doc) => {
@@ -117,8 +111,7 @@ const deleteNews = async (id: string) => {
   await deleteDoc(doc(db, "news", id));
 };
 
-
-// ==================== MEDIA ====================
+// === MEDIA ===
 const getAllMedia = async (): Promise<MediaItem[]> => {
   const snapshot = await getDocs(collection(db, "media"));
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as MediaItem));
@@ -182,7 +175,10 @@ const deleteMedia = async (id: string, filePath?: string) => {
   }
 };
 
-// ==================== ABOUT ====================
+// === CAROUSEL ===
+
+
+// === ABOUT ===
 const getAboutText = async (): Promise<string> => {
   const aboutRef = doc(db, "content", "about");
   const docSnap = await getDoc(aboutRef);
@@ -198,7 +194,7 @@ const updateAboutText = async (newText: string): Promise<{ success: boolean; err
   }
 };
 
-// ==================== EKSPORT ====================
+// === EKSPORT ===
 export {
   db,
   storage,

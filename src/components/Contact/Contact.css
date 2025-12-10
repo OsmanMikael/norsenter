@@ -1,0 +1,36 @@
+.contact-info {
+  background-color: var(--bg-card);
+  padding: var(--spacing);
+  margin: var(--spacing) auto;
+  max-width: calc(var(--spacing) * 30);
+  box-shadow: var(--shadow-default);
+  border-radius: var(--radius);
+}
+
+.contact-info h3 {
+  text-align: center;
+  color: var(--color-primary);
+}
+
+/* delen for å style kartet */
+.location {
+  background-color: var(--bg-card);
+  padding: var(--spacing);
+  margin: var(--spacing) auto;
+  max-width: calc(var(--spacing) * 40);
+  box-shadow: var(--shadow-default);
+  border-radius: var(--radius);
+}
+
+.map-container {
+  width: 100%;
+  height: calc(var(--spacing) * 20);
+  overflow: hidden;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-default);
+}
+
+.location h3 {
+  text-align: center;
+  color: var(--color-primary);
+}

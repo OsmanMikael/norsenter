@@ -1,0 +1,26 @@
+.donation-info {
+  background-color: var(--bg-card);
+  padding: var(--spacing);
+  margin: var(--spacing) auto;
+  max-width: calc(var(--spacing) * 30);
+  box-shadow: var(--shadow-default);
+  border-radius: var(--radius);
+}
+.donation-info h2 {
+  text-align: center;
+  color: var(--color-primary);
+}
+
+.donation-section {
+  margin-bottom: var(--spacing);
+}
+
+html .aya {
+  direction: rtl;
+}
+
+.alert-info {
+  background-color: var(--bg-info);
+  border-color: var(--border-color-info);
+  color: var(--color-secondary);
+}

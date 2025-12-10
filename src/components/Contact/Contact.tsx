@@ -1,14 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext.tsx';
-import { getAllContacts, saveContact, updateContact, deleteContact } from './firebase.tsx';
-import { ContactItem } from '../types/Types.tsx';
+import './Contact.css'
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext.tsx";
+import {
+  getAllContacts,
+  saveContact,
+  updateContact,
+  deleteContact,
+} from "../firebase.tsx";
+import { ContactItem } from "../../types/Types.tsx";
 
 const Contact = () => {
   const { isAdmin } = useAuth();
 
   const [contacts, setContacts] = useState<ContactItem[]>([]);
-  const [address, setAddress] = useState<string>('Nedre Rommen 7a, 0988 Oslo, Norge');
-  const [email, setEmail] = useState<string>('norsenter18f@gmail.com');
+  const [address, setAddress] = useState<string>(
+    "Nedre Rommen 7a, 0988 Oslo, Norge"
+  );
+  const [email, setEmail] = useState<string>("norsenter18f@gmail.com");
 
   const [editing, setEditing] = useState<boolean>(false);
   const [editContact, setEditContact] = useState<ContactItem | null>(null);
@@ -41,7 +49,9 @@ const Contact = () => {
       });
 
       setContacts(
-        contacts.map((c) => (c.id === editContact.id ? { ...c, ...editContact } : c))
+        contacts.map((c) =>
+          c.id === editContact.id ? { ...c, ...editContact } : c
+        )
       );
     } else {
       const newId = await saveContact(editContact);
@@ -66,12 +76,15 @@ const Contact = () => {
       <section className="contact-info">
         <h3>Kontaktinformasjon</h3>
         {isAdmin && (
-          <button className="btn btn-primary mb-3" onClick={() => setEditing(!editing)}>
-            {editing ? 'Avbryt redigering' : 'Rediger kontaktinformasjon'}
+          <button
+            className="btn btn-primary mb-3"
+            onClick={() => setEditing(!editing)}
+          >
+            {editing ? "Avbryt redigering" : "Rediger kontaktinformasjon"}
           </button>
         )}
         <p>
-          <strong>Adresse:</strong>{' '}
+          <strong>Adresse:</strong>{" "}
           {editing ? (
             <input
               type="text"
@@ -84,7 +97,7 @@ const Contact = () => {
           )}
         </p>
         <p>
-          <strong>E-post:</strong>{' '}
+          <strong>E-post:</strong>{" "}
           {editing ? (
             <input
               type="email"
@@ -106,19 +119,33 @@ const Contact = () => {
         {isAdmin && (
           <button
             className="btn btn-primary mb-3"
-            onClick={() => setEditContact({ name: '', phone: '' })}
+            onClick={() => setEditContact({ name: "", phone: "" })}
           >
             Legg til ny kontakt
           </button>
         )}
         {contacts.map((contact) => (
           <div key={contact.id}>
-            <p><strong>Navn:</strong> {contact.name}</p>
-            <p><strong>Telefon:</strong> {contact.phone}</p>
+            <p>
+              <strong>Navn:</strong> {contact.name}
+            </p>
+            <p>
+              <strong>Telefon:</strong> {contact.phone}
+            </p>
             {isAdmin && (
               <>
-                <button className="btn btn-secondary mr-2" onClick={() => handleEditToggle(contact)}>Rediger</button>
-                <button className="btn btn-danger" onClick={() => handleDelete(contact.id)}>Slett</button>
+                <button
+                  className="btn btn-secondary mr-2"
+                  onClick={() => handleEditToggle(contact)}
+                >
+                  Rediger
+                </button>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => handleDelete(contact.id)}
+                >
+                  Slett
+                </button>
               </>
             )}
           </div>
@@ -126,7 +153,9 @@ const Contact = () => {
 
         {editContact && (
           <div>
-            <h4>{editContact.id ? 'Rediger kontakt' : 'Legg til ny kontakt'}</h4>
+            <h4>
+              {editContact.id ? "Rediger kontakt" : "Legg til ny kontakt"}
+            </h4>
             <div className="form-group">
               <label htmlFor="name">Navn:</label>
               <input

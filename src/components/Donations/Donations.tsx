@@ -1,7 +1,8 @@
+import './Donations.css'
 import React, { useState, useEffect } from "react";
-import vipps from "../assets/vipps.png";
-import { useAuth } from "../context/AuthContext.tsx";
-import { db, doc, getDoc, setDoc } from "./firebase.tsx";
+import vipps from "../../assets/vipps.png";
+import { useAuth } from "../../context/AuthContext.tsx";
+import { db, doc, getDoc, setDoc } from "../firebase.tsx";
 
 // Definer typer for donasjonsdataene
 interface DonationInfo {

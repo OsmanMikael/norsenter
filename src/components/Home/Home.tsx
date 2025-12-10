@@ -1,11 +1,12 @@
+import "./Home.css";
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
-import { useAuth } from "../context/AuthContext.tsx";
-import PrayerTimes from "./PrayerTimes.tsx";
+import { useAuth } from "../../context/AuthContext.tsx";
+import PrayerTimes from "../PrayerTimes/PrayerTimes.tsx";
 import { FaWhatsapp } from "react-icons/fa";
-import Donations from "./Donations.tsx";
-import Medier from "./Medier.tsx";
-import { getAllNews, saveNews, deleteNews } from "./firebase.tsx";
-import { NewsItem } from "../types/Types.tsx";
+import Donations from "../Donations/Donations.tsx";
+import Medier from "../Medier/Medier.tsx";
+import { getAllNews, saveNews, deleteNews } from "../firebase.tsx";
+import { NewsItem } from "../../types/Types.tsx";
 
 const Home: React.FC = () => {
   const { isAdmin } = useAuth();
@@ -202,6 +203,7 @@ const Home: React.FC = () => {
           </div>
         </section>
       </div>
+
       <aside className="sidebar">
         <Donations />
       </aside>

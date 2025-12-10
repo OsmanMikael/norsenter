@@ -1,0 +1,13 @@
+.about {
+  background-color: var(--bg-card);
+  padding: var(--spacing);
+  margin: var(--spacing) auto;
+  max-width: calc(var(--spacing) * 40);
+  box-shadow: var(--shadow-default);
+  border-radius: var(--radius);
+}
+
+.about h2 {
+  text-align: center;
+  color: var(--color-primary);
+}

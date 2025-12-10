@@ -1,0 +1,40 @@
+header {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  padding: calc(var(--spacing) / 2) 0;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+nav ul li {
+  display: inline;
+  margin: 0 calc(var(--spacing) / 2);
+}
+
+nav ul li a {
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+nav ul li a:hover {
+  text-decoration: underline;
+}
+
+/* Sørg for at all tekst i headeren er hvit */
+.navbar-nav .nav-link,
+.navbar-brand {
+  color: var(--color-white) !important;
+}
+
+/* Når man holder musen over lenker, sørg for at de ikke endrer farge */
+.navbar-nav .nav-link:hover {
+  color: var(--color-accent) !important;
+}

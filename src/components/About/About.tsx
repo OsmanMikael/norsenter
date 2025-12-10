@@ -1,6 +1,7 @@
+import "./About.css";
 import React, { useState, useEffect } from "react";
 import { getDoc, doc } from "firebase/firestore";
-import { updateAboutText, db } from "./firebase.tsx"; // Husk å importere db fra firebase.js
+import { updateAboutText, db } from "../firebase.tsx"; // Husk å importere db fra firebase.js
 import { onAuthStateChanged, getAuth, User } from "firebase/auth";
 
 // Typing for komponentens tilstand
@@ -61,29 +62,31 @@ const About: React.FC<AboutProps> = () => {
   }
 
   return (
-    <div className="about">
-      <h2>Om Oss</h2>
-      <p>{aboutText || "Informasjon om moskeen kommer her"}</p>
+    <div>
+      <div className="about">
+        <h2>Om Oss</h2>
+        <p>{aboutText || "Informasjon om moskeen kommer her"}</p>
 
-      {/* Vis redigeringsknappen kun hvis brukeren er logget inn */}
-      {isLoggedIn && (
-        <div>
-          <textarea
-            value={aboutText}
-            onChange={(e) => setAboutText(e.target.value)}
-            placeholder="Skriv om oss her..."
-            style={{
-              width: "100%",
-              minHeight: "200px",
-              padding: "10px",
-              boxSizing: "border-box",
-            }}
-          />
+        {/* Vis redigeringsknappen kun hvis brukeren er logget inn */}
+        {isLoggedIn && (
           <div>
-            <button onClick={handleSave}>Lagre</button>
+            <textarea
+              value={aboutText}
+              onChange={(e) => setAboutText(e.target.value)}
+              placeholder="Skriv om oss her..."
+              style={{
+                width: "100%",
+                minHeight: "200px",
+                padding: "10px",
+                boxSizing: "border-box",
+              }}
+            />
+            <div>
+              <button onClick={handleSave}>Lagre</button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

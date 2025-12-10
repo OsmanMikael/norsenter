@@ -1,3 +1,4 @@
+import './PrayerTimes.css'
 import React, { useState, useEffect } from "react";
 
 // Typer for API-svaret
@@ -223,7 +224,7 @@ const PrayerTimes: React.FC = () => {
       {showMonthly && (
         <div>
           <h3>Bønnetider for hele måneden</h3>
-          <label htmlFor="month">Velg måned:</label>
+          <label htmlFor="month"><h4>Velg måned:</h4></label>
           <select id="month" value={selectedMonth} onChange={handleMonthChange}>
             {[...Array(12)].map((_, i) => (
               <option key={i} value={i + 1}>

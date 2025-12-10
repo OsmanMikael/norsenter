@@ -1,8 +1,9 @@
+import './Medier.css'
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
-import { useAuth } from "../context/AuthContext.tsx";
-import { getAllMedia, saveMedia, deleteMedia } from "./firebase.tsx";
+import { useAuth } from "../../context/AuthContext.tsx";
+import { getAllMedia, saveMedia, deleteMedia } from "../firebase.tsx";
 import { Modal } from "bootstrap";
-import { MediaItem } from "../types/Types.tsx";
+import { MediaItem } from "../../types/Types.tsx";
 
 const Medier: React.FC = () => {
   const [media, setMedia] = useState<MediaItem[]>([]);
