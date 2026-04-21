@@ -1,6 +1,10 @@
-node_modules/
-dist/
-build/
+# miljøvariabler
+.env.local
 .env
-firebase-debug.log
-firebase-error.log
+
+# build filer
+build/
+dist/
+
+# node
+node_modules/
